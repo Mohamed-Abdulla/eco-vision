@@ -1,0 +1,8 @@
+Drizzle setup
+
+1. create config file for drizzle
+2. export db with url and schema(create schema)
+3. push changes with npm commands
+    "db:push": "drizzle-kit push",
+    "db:studio": "npx drizzle-kit studio"
+4. npm run db:push

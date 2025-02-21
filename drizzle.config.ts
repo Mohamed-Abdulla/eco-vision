@@ -1,5 +1,5 @@
 export default {
-  dialect: "postgres",
+  dialect: "postgresql",
   schema: "./src/utils/db/schema.ts",
   out: "./drizzle",
   dbCredentials: {

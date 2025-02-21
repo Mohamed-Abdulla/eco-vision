@@ -6,7 +6,9 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "db:push": "drizzle-kit push",
+    "db:studio": "npx drizzle-kit studio"
   },
   "dependencies": {
     "@neondatabase/serverless": "^0.10.4",
@@ -30,6 +32,7 @@
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "drizzle-kit": "^0.30.4",
     "eslint": "^9",
     "eslint-config-next": "15.1.6",
     "postcss": "^8",
