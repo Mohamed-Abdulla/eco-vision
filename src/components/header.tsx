@@ -14,8 +14,10 @@ import { Bell, Coins, Leaf, Menu, Search } from "lucide-react";
 import Link from "next/link";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
 import { useLayout } from "@/app/providers/layout-provider";
-interface HeaderProps {}
-export const Header: FC<HeaderProps> = ({}) => {
+interface HeaderProps {
+  balance: number;
+}
+export const Header: FC<HeaderProps> = ({ balance }) => {
   const isMobile = useMediaQuery("(max-width: 768px)");
   const { toggleSidebar } = useLayout();
 
@@ -82,8 +84,8 @@ export const Header: FC<HeaderProps> = ({}) => {
             </DropdownMenuContent>
           </DropdownMenu>
           <div className="mr-2 md:mr-4 flex items-center bg-gray-100 rounded-full px-2 md:px-3 py-1">
-            <Coins className="h-4 w-4 md:h-5 md:w-5 mr-1 text-green-500" />
-            <span className="font-semibold text-sm md:text-base text-gray-800">{/* {balance.toFixed(2)} */}</span>
+            <Coins className="h-4 w-4 md:h-5 md:w-5 mr-2 text-green-500" />
+            <span className="font-semibold text-sm md:text-base text-gray-800">{balance.toFixed(2)}</span>
           </div>
           <UserButton />
         </div>
