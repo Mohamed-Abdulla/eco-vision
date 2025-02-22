@@ -43,6 +43,7 @@ export async function getAvailableRewards(userId: string) {
     ];
 
     console.log("All available rewards:", allRewards);
+
     return allRewards;
   } catch (error) {
     console.error("Error fetching available rewards:", error);

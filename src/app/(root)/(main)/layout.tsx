@@ -1,6 +1,5 @@
 import { Header } from "@/components/header";
 import { Sidebar } from "@/components/sidebar";
-import { getAvailableRewards } from "@/utils/db/actions/reward.actions";
 import { getOrCreateUser, getUserBalance } from "@/utils/db/actions/user.actions";
 import { auth, currentUser } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
@@ -22,9 +21,8 @@ export default async function MainLayout({
     return redirect("/");
   }
 
-  //fetch available rewards
+  //fetch available balance
   const balance = await getUserBalance(userDetails?.id);
-  console.log("balance:", balance);
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">
