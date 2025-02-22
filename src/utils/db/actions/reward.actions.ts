@@ -1,7 +1,7 @@
 "use server";
 import { eq, desc } from "drizzle-orm";
 import { db } from "../config";
-import { Rewards, Transactions } from "../schema";
+import { Rewards, Transactions, Users } from "../schema";
 
 export async function getAvailableRewards(userId: string) {
   try {
@@ -78,6 +78,29 @@ export async function getRewardTransactions(userId: string) {
     return formattedTransactions;
   } catch (error) {
     console.error("Error fetching reward transactions:", error);
+    return [];
+  }
+}
+
+export async function getAllRewards() {
+  try {
+    const rewards = await db
+      .select({
+        id: Rewards.id,
+        userId: Rewards.userId,
+        points: Rewards.points,
+        level: Rewards.level,
+        createdAt: Rewards.createdAt,
+        userName: Users.name,
+      })
+      .from(Rewards)
+      .leftJoin(Users, eq(Rewards.userId, Users.id))
+      .orderBy(desc(Rewards.points))
+      .execute();
+
+    return rewards;
+  } catch (error) {
+    console.error("Error fetching all rewards:", error);
     return [];
   }
 }
