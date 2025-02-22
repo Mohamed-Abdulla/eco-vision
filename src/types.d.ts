@@ -22,3 +22,12 @@ type Notifications = {
   isRead: boolean;
   createdAt: Date;
 };
+type CollectionTask = {
+  id: string;
+  location: string;
+  wasteType: string;
+  amount: string;
+  status: "pending" | "in_progress" | "completed" | "verified";
+  date: string;
+  collectorId: string | null;
+};
