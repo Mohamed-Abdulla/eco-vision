@@ -1,35 +1,18 @@
-import { integer, varchar, pgTable, serial, text, timestamp, jsonb, boolean } from "drizzle-orm/pg-core";
-import { uuid } from "drizzle-orm/pg-core";
+import { integer, varchar, pgTable, text, timestamp, jsonb, boolean, uuid } from "drizzle-orm/pg-core";
 
 // Users table
 export const Users = pgTable("users", {
-  id: uuid("id").primaryKey().defaultRandom(),
+  id: varchar("id", { length: 255 }).primaryKey(), // Kept as varchar
   email: varchar("email", { length: 255 }).notNull().unique(),
   name: varchar("name", { length: 255 }).notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   role: varchar("role", { length: 255 }).notNull().default("user"),
 });
 
-// Reports table
-export const Reports = pgTable("reports", {
-  id: uuid("id").primaryKey().defaultRandom(),
-  userId: uuid("user_id")
-    .references(() => Users.id)
-    .notNull(),
-  location: text("location").notNull(),
-  wasteType: varchar("waste_type", { length: 255 }).notNull(),
-  amount: varchar("amount", { length: 255 }).notNull(),
-  imageUrl: text("image_url"),
-  verificationResult: jsonb("verification_result"),
-  status: varchar("status", { length: 255 }).notNull().default("pending"),
-  createdAt: timestamp("created_at").defaultNow().notNull(),
-  collectorId: uuid("collector_id").references(() => Users.id),
-});
-
 // Rewards table
 export const Rewards = pgTable("rewards", {
   id: uuid("id").primaryKey().defaultRandom(),
-  userId: uuid("user_id")
+  userId: varchar("user_id", { length: 255 }) // Ensure varchar type
     .references(() => Users.id)
     .notNull(),
   points: integer("points").notNull().default(0),
@@ -42,23 +25,10 @@ export const Rewards = pgTable("rewards", {
   collectionInfo: text("collection_info").notNull(),
 });
 
-// CollectedWastes table
-export const CollectedWastes = pgTable("collected_wastes", {
-  id: uuid("id").primaryKey().defaultRandom(),
-  reportId: uuid("report_id")
-    .references(() => Reports.id)
-    .notNull(),
-  collectorId: uuid("collector_id")
-    .references(() => Users.id)
-    .notNull(),
-  collectionDate: timestamp("collection_date").notNull(),
-  status: varchar("status", { length: 20 }).notNull().default("collected"),
-});
-
 // Notifications table
 export const Notifications = pgTable("notifications", {
   id: uuid("id").primaryKey().defaultRandom(),
-  userId: uuid("user_id")
+  userId: varchar("user_id", { length: 255 }) // Ensure varchar type
     .references(() => Users.id)
     .notNull(),
   message: text("message").notNull(),
@@ -67,10 +37,40 @@ export const Notifications = pgTable("notifications", {
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
-// New Transactions table
+// Reports table
+export const Reports = pgTable("reports", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  userId: varchar("user_id", { length: 255 }) // Ensure varchar type
+    .references(() => Users.id)
+    .notNull(),
+  location: text("location").notNull(),
+  wasteType: varchar("waste_type", { length: 255 }).notNull(),
+  amount: varchar("amount", { length: 255 }).notNull(),
+  imageUrl: text("image_url"),
+  verificationResult: jsonb("verification_result"),
+  status: varchar("status", { length: 255 }).notNull().default("pending"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  collectorId: varchar("collector_id", { length: 255 }) // Ensure varchar type
+    .references(() => Users.id),
+});
+
+// Collected Wastes table
+export const CollectedWastes = pgTable("collected_wastes", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  reportId: uuid("report_id")
+    .references(() => Reports.id)
+    .notNull(),
+  collectorId: varchar("collector_id", { length: 255 }) // Ensure varchar type
+    .references(() => Users.id)
+    .notNull(),
+  collectionDate: timestamp("collection_date").notNull(),
+  status: varchar("status", { length: 20 }).notNull().default("collected"),
+});
+
+// Transactions table
 export const Transactions = pgTable("transactions", {
   id: uuid("id").primaryKey().defaultRandom(),
-  userId: uuid("user_id")
+  userId: varchar("user_id", { length: 255 }) // Ensure varchar type
     .references(() => Users.id)
     .notNull(),
   type: varchar("type", { length: 20 }).notNull(), // 'earned' or 'redeemed'

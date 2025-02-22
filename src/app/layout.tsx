@@ -18,12 +18,14 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${font.className}  antialiased`}>
-        <ClerkProvider>
-          <LayoutProvider>{children}</LayoutProvider>
-          <Toaster />
-        </ClerkProvider>
-      </body>
+      <ClerkProvider>
+        <LayoutProvider>
+          <body className={`${font.className}  antialiased`}>
+            {children}
+            <Toaster />
+          </body>
+        </LayoutProvider>
+      </ClerkProvider>
     </html>
   );
 }
