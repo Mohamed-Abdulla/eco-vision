@@ -13,3 +13,12 @@ type Transaction = {
   description: string;
   date: string;
 };
+
+type Notifications = {
+  id: string;
+  userId: string;
+  message: string;
+  type: string;
+  isRead: boolean;
+  createdAt: Date;
+};

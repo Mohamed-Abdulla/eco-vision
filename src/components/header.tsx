@@ -1,25 +1,36 @@
 "use client";
 
-import { UserButton } from "@clerk/nextjs";
-import { currentUser } from "@clerk/nextjs/server";
-import { FC } from "react";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { Button } from "./ui/button";
-import { Bell, Coins, Leaf, Menu, Search } from "lucide-react";
-import Link from "next/link";
-import { useMediaQuery } from "@/hooks/useMediaQuery";
 import { useLayout } from "@/app/providers/layout-provider";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { useMediaQuery } from "@/hooks/useMediaQuery";
+import { UserButton } from "@clerk/nextjs";
+import { Badge, Bell, Coins, Leaf, Menu, Search } from "lucide-react";
+import Link from "next/link";
+import { FC, useState } from "react";
+import { Button } from "./ui/button";
+import { DropdownMenuItem } from "@radix-ui/react-dropdown-menu";
+import { markNotificationAsRead } from "@/utils/db/actions/notifications.actions";
+import toast from "react-hot-toast";
 interface HeaderProps {
   balance: number;
+  userId: string;
+  notifications: Notifications[];
 }
-export const Header: FC<HeaderProps> = ({ balance }) => {
+export const Header: FC<HeaderProps> = ({ balance, userId, notifications }) => {
   const isMobile = useMediaQuery("(max-width: 768px)");
   const { toggleSidebar } = useLayout();
+
+  const handleNotificationClick = async (notificationId: string) => {
+    try {
+      // await markNotificationAsRead(notificationId);
+      //   setNotificationsData((prevNotifications) =>
+      //     prevNotifications.filter((notification) => notification.id !== notificationId)
+      //   );
+    } catch (error) {
+      console.error("Error marking notification as read:", error);
+      toast.error("Error marking notification as read");
+    }
+  };
 
   return (
     <header className="bg-white border-b border-gray-200 sticky top-0 z-50">
@@ -58,29 +69,24 @@ export const Header: FC<HeaderProps> = ({ balance }) => {
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" size="icon" className="mr-2 relative">
                 <Bell className="h-5 w-5" />
-                {/* {notifications.length > 0 && (
-                <Badge className="absolute -top-1 -right-1 px-1 min-w-[1.2rem] h-5">
-                  {notifications.length}
-                </Badge>
-              )} */}
+                {notifications.length > 0 && (
+                  <Badge className="absolute -top-1 -right-1 px-1 min-w-[1.2rem] h-5">{notifications.length}</Badge>
+                )}
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-64">
-              {/* {notifications.length > 0 ? (
-              notifications.map((notification) => (
-                <DropdownMenuItem 
-                  key={notification.id}
-                  onClick={() => handleNotificationClick(notification.id)}
-                >
-                  <div className="flex flex-col">
-                    <span className="font-medium">{notification.type}</span>
-                    <span className="text-sm text-gray-500">{notification.message}</span>
-                  </div>
-                </DropdownMenuItem>
-              ))
-            ) : (
-              <DropdownMenuItem>No new notifications</DropdownMenuItem>
-            )} */}
+              {notifications.length > 0 ? (
+                notifications.map((notification) => (
+                  <DropdownMenuItem key={notification.id} onClick={() => handleNotificationClick(notification.id)}>
+                    <div className="flex flex-col">
+                      <span className="font-medium">{notification.type}</span>
+                      <span className="text-sm text-gray-500">{notification.message}</span>
+                    </div>
+                  </DropdownMenuItem>
+                ))
+              ) : (
+                <DropdownMenuItem>No new notifications</DropdownMenuItem>
+              )}
             </DropdownMenuContent>
           </DropdownMenu>
           <div className="mr-2 md:mr-4 flex items-center bg-gray-100 rounded-full px-2 md:px-3 py-1">
