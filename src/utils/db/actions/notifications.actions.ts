@@ -1,3 +1,4 @@
+"use server";
 import { and, eq } from "drizzle-orm";
 import { db } from "../config";
 import { Notifications } from "../schema";

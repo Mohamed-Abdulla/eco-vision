@@ -22,7 +22,7 @@ export const Header: FC<HeaderProps> = ({ balance, userId, notifications }) => {
 
   const handleNotificationClick = async (notificationId: string) => {
     try {
-      // await markNotificationAsRead(notificationId);
+      await markNotificationAsRead(notificationId);
       //   setNotificationsData((prevNotifications) =>
       //     prevNotifications.filter((notification) => notification.id !== notificationId)
       //   );
