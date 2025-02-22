@@ -19,13 +19,13 @@ interface HeaderProps {
 export const Header: FC<HeaderProps> = ({ balance, userId, notifications }) => {
   const isMobile = useMediaQuery("(max-width: 768px)");
   const { toggleSidebar } = useLayout();
-
+  const [notificationsData, setNotificationsData] = useState(notifications);
   const handleNotificationClick = async (notificationId: string) => {
     try {
       await markNotificationAsRead(notificationId);
-      //   setNotificationsData((prevNotifications) =>
-      //     prevNotifications.filter((notification) => notification.id !== notificationId)
-      //   );
+      setNotificationsData((prevNotifications) =>
+        prevNotifications.filter((notification) => notification.id !== notificationId)
+      );
     } catch (error) {
       console.error("Error marking notification as read:", error);
       toast.error("Error marking notification as read");
@@ -69,14 +69,14 @@ export const Header: FC<HeaderProps> = ({ balance, userId, notifications }) => {
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" size="icon" className="mr-2 relative">
                 <Bell className="h-5 w-5" />
-                {notifications.length > 0 && (
-                  <Badge className="absolute -top-1 -right-1 px-1 min-w-[1.2rem] h-5">{notifications.length}</Badge>
+                {notificationsData.length > 0 && (
+                  <Badge className="absolute -top-1 -right-1 px-1 min-w-[1.2rem] h-5">{notificationsData.length}</Badge>
                 )}
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-64">
-              {notifications.length > 0 ? (
-                notifications.map((notification) => (
+              {notificationsData.length > 0 ? (
+                notificationsData.map((notification) => (
                   <DropdownMenuItem key={notification.id} onClick={() => handleNotificationClick(notification.id)}>
                     <div className="flex flex-col">
                       <span className="font-medium">{notification.type}</span>
@@ -85,7 +85,7 @@ export const Header: FC<HeaderProps> = ({ balance, userId, notifications }) => {
                   </DropdownMenuItem>
                 ))
               ) : (
-                <DropdownMenuItem>No new notifications</DropdownMenuItem>
+                <DropdownMenuItem className="text-center p-1">No new notifications</DropdownMenuItem>
               )}
             </DropdownMenuContent>
           </DropdownMenu>
