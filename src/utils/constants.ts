@@ -12,3 +12,4 @@ Respond in JSON format like this:
 
 export const geminiModel = "gemini-1.5-flash";
 export const reportingPoint = 10;
+export const ITEMS_PER_PAGE = 5;

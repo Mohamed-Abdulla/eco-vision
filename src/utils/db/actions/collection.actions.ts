@@ -1,5 +1,6 @@
 "use server";
 
+import { eq } from "drizzle-orm";
 import { db } from "../config";
 import { Reports } from "../schema";
 
@@ -26,5 +27,24 @@ export async function getWasteCollectionTasks(limit: number = 20) {
   } catch (error) {
     console.error("Error fetching waste collection tasks:", error);
     return [];
+  }
+}
+
+export async function updateTaskStatus(reportId: string, newStatus: string, collectorId?: string) {
+  try {
+    const updateData: any = { status: newStatus };
+    if (collectorId !== undefined) {
+      updateData.collectorId = collectorId;
+    }
+    const [updatedReport] = await db
+      .update(Reports)
+      .set(updateData)
+      .where(eq(Reports.id, reportId))
+      .returning()
+      .execute();
+    return updatedReport;
+  } catch (error) {
+    console.error("Error updating task status:", error);
+    throw error;
   }
 }

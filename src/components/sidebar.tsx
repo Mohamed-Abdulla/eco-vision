@@ -2,14 +2,14 @@
 
 import { useLayout } from "@/app/providers/layout-provider";
 import { Button } from "@/components/ui/button";
-import { Coins, Home, MapPin, Medal, Settings, Trash } from "lucide-react";
+import { Coins, Home, MapPin, Medal, Trash } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
 const sidebarItems = [
   { href: "/", icon: Home, label: "Home" },
   { href: "/report", icon: MapPin, label: "Report Waste" },
-  { href: "/collect", icon: Trash, label: "Collect Waste" },
+  // { href: "/collect", icon: Trash, label: "Collect Waste" },
   { href: "/rewards", icon: Coins, label: "Rewards" },
   { href: "/leaderboard", icon: Medal, label: "Leaderboard" },
 ];

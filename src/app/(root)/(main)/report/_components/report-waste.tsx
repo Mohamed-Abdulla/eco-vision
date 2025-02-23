@@ -107,10 +107,7 @@ export const ReportWaste: FC<ReportWasteProps> = ({ userId }) => {
       const result = await model.generateContent([reportingPrompt, ...imageParts]);
       const response = result.response;
       const text = response.text();
-      console.log("Verification response:", text);
       const cleanedText = text.trim().replace(/^```json\s*|\s*```$/g, "");
-
-      console.log("Verification result:", cleanedText);
 
       try {
         const parsedResult = JSON.parse(cleanedText);
