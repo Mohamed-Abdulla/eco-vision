@@ -1,5 +1,5 @@
 "use server";
-import { eq, desc } from "drizzle-orm";
+import { eq, desc, sql } from "drizzle-orm";
 import { db } from "../config";
 import { Rewards, Transactions, Users } from "../schema";
 
@@ -98,10 +98,28 @@ export async function getAllRewards() {
       .leftJoin(Users, eq(Rewards.userId, Users.id))
       .orderBy(desc(Rewards.points))
       .execute();
-
+    console.log("All rewards:", rewards);
     return rewards;
   } catch (error) {
     console.error("Error fetching all rewards:", error);
     return [];
+  }
+}
+
+export async function updateRewardPoints(userId: string, pointsToAdd: number) {
+  try {
+    const [updatedReward] = await db
+      .update(Rewards)
+      .set({
+        points: sql`${Rewards.points} + ${pointsToAdd}`,
+        updatedAt: new Date(),
+      })
+      .where(eq(Rewards.userId, userId))
+      .returning()
+      .execute();
+    return updatedReward;
+  } catch (error) {
+    console.error("Error updating reward points:", error);
+    return null;
   }
 }

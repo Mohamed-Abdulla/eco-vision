@@ -18,6 +18,8 @@ const Page: FC<PageProps> = async () => {
     getAllRewards().catch(() => []),
   ]);
 
+  console.log({ rewards });
+
   return (
     <div className="max-w-3xl mx-auto py-10">
       <h1 className="text-3xl font-semibold text-gray-800 mb-6">Leaderboard</h1>

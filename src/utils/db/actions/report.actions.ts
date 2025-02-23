@@ -7,6 +7,7 @@ import { Reports, Rewards } from "../schema";
 import { createNotification } from "./notifications.actions";
 import { createTransaction } from "./transactions.actions";
 import { revalidatePath } from "next/cache";
+import { updateRewardPoints } from "./reward.actions";
 
 export async function getRecentReports(limit: number = 10) {
   try {
@@ -57,24 +58,6 @@ export async function createReport(
     return report;
   } catch (error) {
     console.error("Error creating report:", error);
-    return null;
-  }
-}
-
-export async function updateRewardPoints(userId: string, pointsToAdd: number) {
-  try {
-    const [updatedReward] = await db
-      .update(Rewards)
-      .set({
-        points: sql`${Rewards.points} + ${pointsToAdd}`,
-        updatedAt: new Date(),
-      })
-      .where(eq(Rewards.userId, userId))
-      .returning()
-      .execute();
-    return updatedReward;
-  } catch (error) {
-    console.error("Error updating reward points:", error);
     return null;
   }
 }
