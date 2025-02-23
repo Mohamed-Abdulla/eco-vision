@@ -6,7 +6,7 @@ import { useMediaQuery } from "@/hooks/useMediaQuery";
 import { UserButton } from "@clerk/nextjs";
 import { Badge, Bell, Coins, Leaf, Menu, Search } from "lucide-react";
 import Link from "next/link";
-import { FC, useState } from "react";
+import { FC, useEffect, useState } from "react";
 import { Button } from "./ui/button";
 import { DropdownMenuItem } from "@radix-ui/react-dropdown-menu";
 import { markNotificationAsRead } from "@/utils/db/actions/notifications.actions";
@@ -31,6 +31,11 @@ export const Header: FC<HeaderProps> = ({ balance, userId, notifications }) => {
       toast.error("Error marking notification as read");
     }
   };
+  useEffect(() => {
+    if (notifications !== notificationsData) {
+      setNotificationsData(notifications);
+    }
+  }, [notifications]);
 
   return (
     <header className="bg-white border-b border-gray-200 sticky top-0 z-50">
@@ -74,12 +79,12 @@ export const Header: FC<HeaderProps> = ({ balance, userId, notifications }) => {
                 )}
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-64">
+            <DropdownMenuContent align="end" className="w-72 p-4">
               {notificationsData.length > 0 ? (
                 notificationsData.map((notification) => (
                   <DropdownMenuItem key={notification.id} onClick={() => handleNotificationClick(notification.id)}>
                     <div className="flex flex-col">
-                      <span className="font-medium">{notification.type}</span>
+                      <span className="font-medium capitalize">{notification.type}</span>
                       <span className="text-sm text-gray-500">{notification.message}</span>
                     </div>
                   </DropdownMenuItem>

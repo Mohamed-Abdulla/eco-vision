@@ -1,11 +1,25 @@
 import { getRecentReports } from "@/utils/db/actions/report.actions";
+import { getOrCreateUser } from "@/utils/db/actions/user.actions";
+import { auth } from "@clerk/nextjs/server";
 import { MapPin } from "lucide-react";
+import { redirect } from "next/navigation";
 import { FC } from "react";
 import { ReportWaste } from "./_components/report-waste";
 
 interface PageProps {}
 
 const Page: FC<PageProps> = async ({}) => {
+  const { userId } = await auth();
+
+  if (!userId) {
+    return redirect("/");
+  }
+  const user = await getOrCreateUser(userId);
+
+  if (!user) {
+    return redirect("/");
+  }
+
   const recentReports = (await getRecentReports()) || [];
   const reports = recentReports.map((report) => ({
     ...report,
@@ -15,7 +29,7 @@ const Page: FC<PageProps> = async ({}) => {
   return (
     <div className="p-8 max-w-4xl mx-auto">
       <h1 className="text-3xl font-semibold mb-6 text-gray-800">Report waste</h1>
-      <ReportWaste />
+      <ReportWaste userId={user.id} />
       <h2 className="text-3xl font-semibold mb-6 text-gray-800">Recent Reports</h2>
       <div className="bg-white rounded-2xl shadow-lg overflow-hidden">
         <div className="max-h-96 overflow-y-auto">

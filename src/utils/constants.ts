@@ -9,3 +9,6 @@ Respond in JSON format like this:
   "quantity": "estimated quantity with unit",
   "confidence": confidence level as a number between 0 and 1
 }`;
+
+export const geminiModel = "gemini-1.5-flash";
+export const reportingPoint = 10;

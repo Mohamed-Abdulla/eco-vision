@@ -7,14 +7,18 @@ import { Libraries } from "@react-google-maps/api";
 import { toast } from "react-hot-toast";
 import { Button } from "@/components/ui/button";
 import { CheckCircle, Loader, Upload } from "lucide-react";
+import { createReport } from "@/utils/db/actions/report.actions";
+import { geminiModel, reportingPrompt } from "@/utils/constants";
 
 const geminiApiKey = process.env.NEXT_PUBLIC_GEMINI_API_KEY;
 const googleMapsApiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
 const libraries: Libraries = ["places"];
 
-interface ReportWasteProps {}
+interface ReportWasteProps {
+  userId: string;
+}
 
-export const ReportWaste: FC<ReportWasteProps> = ({}) => {
+export const ReportWaste: FC<ReportWasteProps> = ({ userId }) => {
   const [newReport, setNewReport] = useState({
     location: "",
     type: "",
@@ -32,11 +36,12 @@ export const ReportWaste: FC<ReportWasteProps> = ({}) => {
 
   const [searchBox, setSearchBox] = useState<google.maps.places.SearchBox | null>(null);
 
-  const { isLoaded } = useJsApiLoader({
-    id: "google-map-script",
-    googleMapsApiKey: googleMapsApiKey!,
-    libraries: libraries,
-  });
+  const isLoaded = false;
+  // const { isLoaded } = useJsApiLoader({
+  //   id: "google-map-script",
+  //   googleMapsApiKey: googleMapsApiKey!,
+  //   libraries: libraries,
+  // });
   const onLoad = useCallback((ref: google.maps.places.SearchBox) => {
     setSearchBox(ref);
   }, []);
@@ -69,6 +74,7 @@ export const ReportWaste: FC<ReportWasteProps> = ({}) => {
     }
   };
 
+  //for the verification process, we need to read the file as base64
   const readFileAsBase64 = (file: File): Promise<string> => {
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
@@ -78,8 +84,103 @@ export const ReportWaste: FC<ReportWasteProps> = ({}) => {
     });
   };
 
-  const handleVerify = async () => {};
-  const handleSubmit = async () => {};
+  const handleVerify = async () => {
+    if (!file) return;
+
+    setVerificationStatus("verifying");
+
+    try {
+      const genAI = new GoogleGenerativeAI(geminiApiKey!);
+      const model = genAI.getGenerativeModel({ model: geminiModel });
+
+      const base64Data = await readFileAsBase64(file);
+
+      const imageParts = [
+        {
+          inlineData: {
+            data: base64Data.split(",")[1],
+            mimeType: file.type,
+          },
+        },
+      ];
+
+      const result = await model.generateContent([reportingPrompt, ...imageParts]);
+      const response = result.response;
+      const text = response.text();
+      console.log("Verification response:", text);
+      const cleanedText = text.trim().replace(/^```json\s*|\s*```$/g, "");
+
+      console.log("Verification result:", cleanedText);
+
+      try {
+        const parsedResult = JSON.parse(cleanedText);
+        if (parsedResult.wasteType && parsedResult.quantity && parsedResult.confidence) {
+          setVerificationResult(parsedResult);
+          setVerificationStatus("success");
+          setNewReport({
+            ...newReport,
+            type: parsedResult.wasteType,
+            amount: parsedResult.quantity,
+          });
+          toast.success("Waste verified successfully!");
+        } else {
+          console.error("Invalid verification result:", parsedResult);
+          setVerificationStatus("failure");
+          toast.error("Failed to verify waste. Please try again.");
+        }
+      } catch (error) {
+        console.error("Failed to parse JSON response:", text);
+        setVerificationStatus("failure");
+        toast.error("Failed to verify waste. Please try again.");
+      }
+    } catch (error) {
+      console.error("Error verifying waste:", error);
+      setVerificationStatus("failure");
+      toast.error("Failed to verify waste. Please try again.");
+    }
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (verificationStatus !== "success" || !userId) {
+      toast.error("Please verify the waste before submitting or log in.");
+      return;
+    }
+
+    setIsSubmitting(true);
+    try {
+      const report = (await createReport(
+        userId,
+        newReport.location,
+        newReport.type,
+        newReport.amount,
+        preview || undefined,
+        verificationResult ? JSON.stringify(verificationResult) : undefined
+      )) as any;
+
+      const formattedReport = {
+        id: report.id,
+        location: report.location,
+        wasteType: report.wasteType,
+        amount: report.amount,
+        createdAt: report.createdAt.toISOString().split("T")[0],
+      };
+
+      // setReports([formattedReport, ...reports]);
+      setNewReport({ location: "", type: "", amount: "" });
+      setFile(null);
+      setPreview(null);
+      setVerificationStatus("idle");
+      setVerificationResult(null);
+
+      toast.success(`Report submitted successfully! You've earned points for reporting waste.`);
+    } catch (error) {
+      console.error("Error submitting report:", error);
+      toast.error("Failed to submit report. Please try again.");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   return (
     <form onSubmit={handleSubmit} className="bg-white p-8 rounded-2xl shadow-lg mb-12">

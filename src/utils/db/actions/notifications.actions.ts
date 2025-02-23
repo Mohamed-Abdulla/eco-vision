@@ -23,3 +23,13 @@ export async function markNotificationAsRead(notificationId: string) {
     console.error("Error marking notification as read:", error);
   }
 }
+
+export async function createNotification(userId: string, message: string, type: string) {
+  try {
+    const [notification] = await db.insert(Notifications).values({ userId, message, type }).returning().execute();
+    return notification;
+  } catch (error) {
+    console.error("Error creating notification:", error);
+    return null;
+  }
+}
