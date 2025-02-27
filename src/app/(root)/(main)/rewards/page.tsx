@@ -115,7 +115,7 @@ const Page: FC<PageProps> = async ({}) => {
           </div>
         </div>
 
-        <div>
+        {/* <div>
           <h2 className="text-2xl font-semibold mb-4 text-gray-800">Available Rewards</h2>
           <div className="space-y-4">
             {filteredRewards.length > 0 ? (
@@ -159,7 +159,7 @@ const Page: FC<PageProps> = async ({}) => {
               </div>
             )}
           </div>
-        </div>
+        </div> */}
       </div>
     </div>
   );
