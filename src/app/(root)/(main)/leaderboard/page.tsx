@@ -7,9 +7,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { FC } from "react";
 
-interface PageProps {}
-
-const Page: FC<PageProps> = async () => {
+const Page = async () => {
   const { userId } = await auth();
   if (!userId) return redirect("/sign-in");
 

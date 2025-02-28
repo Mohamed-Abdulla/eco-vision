@@ -1,13 +1,11 @@
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { ITEMS_PER_PAGE } from "@/utils/constants";
 import { getWasteCollectionTasks } from "@/utils/db/actions/collection.actions";
 import { getOrCreateUser } from "@/utils/db/actions/user.actions";
 import { auth } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 import { FC } from "react";
-import { SearchBox } from "./_components/search-box";
-import { ITEMS_PER_PAGE } from "@/utils/constants";
 import { Pagination } from "./_components/pagination";
+import { SearchBox } from "./_components/search-box";
 import { Tasks } from "./_components/tasks";
 
 interface PageProps {

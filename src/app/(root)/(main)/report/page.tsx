@@ -3,12 +3,9 @@ import { getOrCreateUser } from "@/utils/db/actions/user.actions";
 import { auth } from "@clerk/nextjs/server";
 import { MapPin } from "lucide-react";
 import { redirect } from "next/navigation";
-import { FC } from "react";
 import { ReportWaste } from "./_components/report-waste";
 
-interface PageProps {}
-
-const Page: FC<PageProps> = async ({}) => {
+const Page = async ({}) => {
   const { userId } = await auth();
 
   if (!userId) {

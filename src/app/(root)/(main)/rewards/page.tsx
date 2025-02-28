@@ -1,16 +1,13 @@
 import { Button } from "@/components/ui/button";
 import { getAvailableRewards, getRewardTransactions } from "@/utils/db/actions/reward.actions";
 import { getOrCreateUser, getUserBalance } from "@/utils/db/actions/user.actions";
-import { auth, currentUser } from "@clerk/nextjs/server";
-import { AlertCircle, ArrowDownRight, ArrowUpRight, Coins, Gift } from "lucide-react";
+import { auth } from "@clerk/nextjs/server";
+import { ArrowDownRight, ArrowUpRight, Coins } from "lucide-react";
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { FC } from "react";
 import toast from "react-hot-toast";
 
-interface PageProps {}
-
-const Page: FC<PageProps> = async ({}) => {
+const Page = async ({}) => {
   const { userId } = await auth();
   if (!userId) {
     return redirect("/");

@@ -13,6 +13,9 @@
     "isolatedModules": true,
     "jsx": "preserve",
     "incremental": true,
+    //!remove the following lines in production
+    "noUnusedParameters": false,
+    "noImplicitAny": false,
     "plugins": [
       {
         "name": "next"

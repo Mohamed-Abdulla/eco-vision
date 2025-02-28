@@ -14,9 +14,7 @@ const sidebarItems = [
   { href: "/leaderboard", icon: Medal, label: "Leaderboard" },
 ];
 
-interface SidebarProps {}
-
-export const Sidebar: FC<SidebarProps> = ({}) => {
+export const Sidebar = ({}) => {
   const { sidebarOpen } = useLayout();
   const pathname = usePathname();
 
@@ -46,7 +44,3 @@ export const Sidebar: FC<SidebarProps> = ({}) => {
     </aside>
   );
 };
-
-import { FC } from "react";
-
-interface SidebarProps {}

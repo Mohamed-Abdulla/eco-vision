@@ -2,7 +2,7 @@ import { Header } from "@/components/header";
 import { Sidebar } from "@/components/sidebar";
 import { getUnreadNotifications } from "@/utils/db/actions/notifications.actions";
 import { getOrCreateUser, getUserBalance } from "@/utils/db/actions/user.actions";
-import { auth, currentUser } from "@clerk/nextjs/server";
+import { auth } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 
 export default async function MainLayout({

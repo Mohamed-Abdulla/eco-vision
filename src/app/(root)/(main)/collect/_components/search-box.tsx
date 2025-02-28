@@ -3,12 +3,9 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Search } from "lucide-react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { FC } from "react";
 import { useDebouncedCallback } from "use-debounce";
 
-interface SearchProps {}
-
-export const SearchBox: FC<SearchProps> = ({}) => {
+export const SearchBox = ({}) => {
   const searchParams = useSearchParams();
   const { replace } = useRouter();
   const pathname = usePathname();

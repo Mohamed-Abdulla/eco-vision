@@ -1,8 +1,4 @@
-import { FC } from "react";
-
-interface LoadingProps {}
-
-const Loading: FC<LoadingProps> = ({}) => {
+const Loading = ({}) => {
   return (
     <div role="status" className="flex items-center justify-center h-screen">
       <svg

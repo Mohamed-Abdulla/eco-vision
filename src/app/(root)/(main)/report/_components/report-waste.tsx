@@ -1,18 +1,17 @@
 "use client";
 import { FC, useCallback, useState } from "react";
 
-import { GoogleGenerativeAI } from "@google/generative-ai";
-import { StandaloneSearchBox, useJsApiLoader } from "@react-google-maps/api";
-import { Libraries } from "@react-google-maps/api";
-import { toast } from "react-hot-toast";
 import { Button } from "@/components/ui/button";
-import { CheckCircle, Loader, Upload } from "lucide-react";
-import { createReport } from "@/utils/db/actions/report.actions";
 import { geminiModel, reportingPrompt } from "@/utils/constants";
+import { createReport } from "@/utils/db/actions/report.actions";
+import { GoogleGenerativeAI } from "@google/generative-ai";
+import { StandaloneSearchBox } from "@react-google-maps/api";
+import { CheckCircle, Loader, Upload } from "lucide-react";
+import { toast } from "react-hot-toast";
 
 const geminiApiKey = process.env.NEXT_PUBLIC_GEMINI_API_KEY;
-const googleMapsApiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
-const libraries: Libraries = ["places"];
+// const googleMapsApiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
+// const libraries: Libraries = ["places"];
 
 interface ReportWasteProps {
   userId: string;
