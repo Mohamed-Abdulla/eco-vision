@@ -9,12 +9,12 @@ import { usePathname } from "next/navigation";
 const sidebarItems = [
   { href: "/", icon: Home, label: "Home" },
   { href: "/report", icon: MapPin, label: "Report Waste" },
-  // { href: "/collect", icon: Trash, label: "Collect Waste" },
+  { href: "/collect", icon: Trash, label: "Collect Waste" },
   { href: "/rewards", icon: Coins, label: "Rewards" },
   { href: "/leaderboard", icon: Medal, label: "Leaderboard" },
 ];
 
-export const Sidebar = ({}) => {
+export const Sidebar = ({ userRole }) => {
   const { sidebarOpen } = useLayout();
   const pathname = usePathname();
 
@@ -26,19 +26,21 @@ export const Sidebar = ({}) => {
     >
       <nav className="h-full flex flex-col justify-between">
         <div className="px-4 py-6 space-y-8">
-          {sidebarItems.map((item) => (
-            <Link key={item.href} href={item.href} passHref>
-              <Button
-                variant={pathname === item.href ? "secondary" : "ghost"}
-                className={`w-full justify-start py-3 ${
-                  pathname === item.href ? "bg-green-100 text-green-800" : "text-gray-600 hover:bg-gray-100"
-                }`}
-              >
-                <item.icon className="mr-3 h-5 w-5" />
-                <span className="text-base">{item.label}</span>
-              </Button>
-            </Link>
-          ))}
+          {sidebarItems
+            .filter((item) => !(item.href === "/collect" && userRole !== "admin"))
+            .map((item) => (
+              <Link key={item.href} href={item.href} passHref>
+                <Button
+                  variant={pathname === item.href ? "secondary" : "ghost"}
+                  className={`w-full justify-start py-3 ${
+                    pathname === item.href ? "bg-green-100 text-green-800" : "text-gray-600 hover:bg-gray-100"
+                  }`}
+                >
+                  <item.icon className="mr-3 h-5 w-5" />
+                  <span className="text-base">{item.label}</span>
+                </Button>
+              </Link>
+            ))}
         </div>
       </nav>
     </aside>

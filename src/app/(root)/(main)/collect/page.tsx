@@ -21,8 +21,11 @@ const Page: FC<PageProps> = async ({ searchParams }) => {
     return redirect("/");
   }
   const user = await getOrCreateUser(userId);
-
   if (!user) {
+    return redirect("/");
+  }
+  //if user role is not admin, redirect to home
+  if (user.role !== "admin") {
     return redirect("/");
   }
   const tasks = ((await getWasteCollectionTasks()) as CollectionTask[]) || [];
@@ -30,8 +33,6 @@ const Page: FC<PageProps> = async ({ searchParams }) => {
   const searchTerm = await searchParams;
   const query = searchTerm?.query || "";
   const currentPage = parseInt(searchTerm?.page || "1", 10);
-
-  console.log(query);
 
   const filteredTasks = tasks.filter((task) => task.location.toLowerCase().includes(query.toLowerCase()));
   const pageCount = Math.ceil(filteredTasks.length / ITEMS_PER_PAGE);
