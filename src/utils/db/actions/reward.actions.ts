@@ -83,6 +83,41 @@ export async function getRewardTransactions(userId: string) {
   }
 }
 
+//getRewardTransactions for all users
+export async function getAllRewardTransactions() {
+  try {
+    const transactions = await db
+      .select({
+        id: Transactions.id,
+        userId: Transactions.userId,
+        type: Transactions.type,
+        amount: Transactions.amount,
+        description: Transactions.description,
+        date: Transactions.date,
+      })
+      .from(Transactions)
+      .orderBy(desc(Transactions.date))
+      .execute();
+
+    const groupedTransactions = Object.values(
+      transactions.reduce((acc, { userId, amount, ...rest }) => {
+        if (!acc[userId]) {
+          acc[userId] = { ...rest, userId, amount };
+        } else {
+          acc[userId].amount += amount;
+        }
+        return acc;
+      }, {})
+    );
+
+    console.log("All transactions:", groupedTransactions);
+    return groupedTransactions;
+  } catch (error) {
+    console.error("Error fetching all transactions:", error);
+    return [];
+  }
+}
+
 export async function getAllRewards() {
   try {
     const rewards = await db
@@ -92,7 +127,7 @@ export async function getAllRewards() {
         points: Rewards.points,
         level: Rewards.level,
         createdAt: Rewards.createdAt,
-        userName: Users.name,
+        email: Users.email,
       })
       .from(Rewards)
       .leftJoin(Users, eq(Rewards.userId, Users.id))
@@ -108,15 +143,26 @@ export async function getAllRewards() {
 
 export async function updateRewardPoints(userId: string, pointsToAdd: number) {
   try {
-    const [updatedReward] = await db
-      .update(Rewards)
-      .set({
-        points: sql`${Rewards.points} + ${pointsToAdd}`,
+    const updatedReward = await db
+      .insert(Rewards)
+      .values({
+        userId,
+        points: pointsToAdd,
         updatedAt: new Date(),
+        name: "Default Reward",
+        collectionInfo: "Default Collection Info",
       })
-      .where(eq(Rewards.userId, userId))
+      .onConflictDoUpdate({
+        target: Rewards.userId,
+        set: {
+          points: sql`${Rewards.points} + ${pointsToAdd}`,
+          updatedAt: new Date(),
+          level: sql`FLOOR((EXCLUDED.points + ${Rewards.points}) / 100) + 1`,
+        },
+      })
       .returning()
       .execute();
+
     return updatedReward;
   } catch (error) {
     console.error("Error updating reward points:", error);

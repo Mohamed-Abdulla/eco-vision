@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { getAllRewards } from "@/utils/db/actions/reward.actions";
+import { getAllRewards, getAllRewardTransactions } from "@/utils/db/actions/reward.actions";
 import { getOrCreateUser } from "@/utils/db/actions/user.actions";
 import { auth } from "@clerk/nextjs/server";
 import { Award, Crown, Trophy, User } from "lucide-react";
@@ -16,7 +16,7 @@ const Page = async () => {
     getAllRewards().catch(() => []),
   ]);
 
-  console.log({ rewards });
+  console.log({ user });
 
   return (
     <div className="max-w-3xl mx-auto py-10">
@@ -72,8 +72,8 @@ const LeaderboardRow: FC<{ reward: any; index: number; isCurrentUser: boolean }>
   const crownColors = ["text-yellow-400", "text-gray-400", "text-yellow-600"];
   return (
     <tr className={`${isCurrentUser ? "bg-indigo-50" : ""} hover:bg-gray-50 transition`}>
-      <td className="px-6 py-4 whitespace-nowrap">
-        <div className="flex items-center">
+      <td className="px-6 py-4 text-center ">
+        <div className="flex items-center justify-center">
           {index < 3 ? (
             <Crown className={`h-6 w-6 ${crownColors[index]}`} />
           ) : (
@@ -81,21 +81,25 @@ const LeaderboardRow: FC<{ reward: any; index: number; isCurrentUser: boolean }>
           )}
         </div>
       </td>
-      <td className="px-6 py-4 flex items-center whitespace-nowrap">
-        <User className="h-10 w-10 bg-gray-200 text-gray-500 p-2 rounded-full" />
-        <span className="ml-4 text-sm font-medium text-gray-900">{reward.userName}</span>
+
+      <td className="px-6 py-4 ">
+        <div className="flex items-center gap-4">
+          <User className="h-10 w-10 bg-gray-200 text-gray-500 p-2 rounded-full" />
+          <span className="text-sm font-medium text-gray-900 min-w-[120px]">{reward.email}</span>
+        </div>
       </td>
-      <td className="px-6 py-4 flex items-center whitespace-nowrap">
-        <Award className="h-5 w-5 text-indigo-500 mr-2" />
-        <span className="text-sm font-semibold text-gray-900">{reward.points.toLocaleString()}</span>
+
+      <td className="px-6 py-4 text-center ">
+        <div className="flex items-center gap-4">
+          <Award className="h-5 w-5 text-indigo-500 mr-2" />
+          <span className="text-sm font-semibold text-gray-900">{reward.points}</span>
+        </div>
       </td>
-      <td className="px-6 py-4 whitespace-nowrap">
-        <span className="px-3 py-1 inline-flex text-sm font-semibold rounded-full bg-indigo-100 text-indigo-800">
-          Level {reward.level}
-        </span>
+
+      <td className="px-6 py-4 text-center">
+        <span className="text-sm font-semibold text-gray-900">{reward.level}</span>
       </td>
     </tr>
   );
 };
-
 export default Page;
