@@ -26,13 +26,17 @@ export async function getOrCreateUser(userId: string) {
     }
     const client = await clerkClient();
     const role = authUser?.privateMetadata.role;
-
+    console.log("role", role);
     if (!role) {
       await client.users.updateUserMetadata(userId, {
         privateMetadata: {
           role: user?.role,
         },
       });
+    }
+    //if role is admin, update user role to admin
+    if (role === "admin") {
+      await db.update(Users).set({ role: "admin" }).where(eq(Users.clerkId, userId)).execute();
     }
     if (!user) {
       //create user
