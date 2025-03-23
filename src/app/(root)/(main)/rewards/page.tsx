@@ -1,11 +1,10 @@
 import { Button } from "@/components/ui/button";
-import { getAvailableRewards, getRewardTransactions } from "@/utils/db/actions/reward.actions";
+import { getRewardTransactions } from "@/utils/db/actions/reward.actions";
 import { getOrCreateUser, getUserBalance } from "@/utils/db/actions/user.actions";
 import { auth } from "@clerk/nextjs/server";
 import { ArrowDownRight, ArrowUpRight, Coins } from "lucide-react";
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import toast from "react-hot-toast";
 
 const Page = async ({}) => {
   const { userId } = await auth();
@@ -20,38 +19,6 @@ const Page = async ({}) => {
   //fetch available rewards
   const balance = (await getUserBalance(user?.id)) || 0;
   const transactions = (await getRewardTransactions(user.id)) || [];
-  const rewards = (await getAvailableRewards(user.id)) || [];
-  const filteredRewards = rewards.filter((reward) => reward.cost > 0);
-
-  const handleRedeemReward = async (rewardId: string) => {
-    if (!user) {
-      toast.error("Please log in to redeem rewards.");
-      return;
-    }
-
-    const reward = rewards.find((r) => r.id === rewardId);
-    if (reward && balance >= reward.cost && reward.cost > 0) {
-      try {
-        if (balance < reward.cost) {
-          toast.error("Insufficient balance to redeem this reward");
-          return;
-        }
-
-        // // Update database
-        // await redeemReward(user.id, rewardId);
-
-        // // Create a new transaction record
-        // await createTransaction(user.id, 'redeemed', reward.cost, `Redeemed ${reward.name}`);
-
-        toast.success(`You have successfully redeemed: ${reward.name}`);
-      } catch (error) {
-        console.error("Error redeeming reward:", error);
-        toast.error("Failed to redeem reward. Please try again.");
-      }
-    } else {
-      toast.error("Insufficient balance or invalid reward cost");
-    }
-  };
 
   return (
     <div className="p-8 max-w-4xl mx-auto">
@@ -68,15 +35,15 @@ const Page = async ({}) => {
           </div>
         </div>
       </div>
-      <div className="grid md:grid-cols-2 gap-8">
+      <div className="grid md:grid-cols-1 gap-8">
         <div>
           <h2 className="text-2xl font-semibold mb-4 text-gray-800">Recent Transactions</h2>
-          <div className="bg-white rounded-xl shadow-md overflow-hidden">
+          <div className="bg-white rounded-xl shadow-md overflow-hidden w-full">
             {transactions.length > 0 ? (
               transactions.map((transaction) => (
                 <div
                   key={transaction.id}
-                  className="flex items-center justify-between p-4 border-b border-gray-200 last:border-b-0"
+                  className="grid grid-cols-[2fr_1fr_1fr] w-full p-4 border-b border-gray-200 last:border-b-0 items-center"
                 >
                   <div className="flex items-center">
                     {transaction.type === "earned_report" ? (
@@ -86,13 +53,11 @@ const Page = async ({}) => {
                     ) : (
                       <ArrowDownRight className="w-5 h-5 text-red-500 mr-3" />
                     )}
-                    <div>
-                      <p className="font-medium text-gray-800">{transaction.description}</p>
-                      <p className="text-sm text-gray-500">{transaction.date}</p>
-                    </div>
+                    <p className="font-medium text-gray-800">{transaction.description}</p>
                   </div>
+                  <p className="text-gray-500">{transaction.date}</p>
                   <span
-                    className={`font-semibold ${
+                    className={`font-semibold justify-self-end ${
                       transaction.type.startsWith("earned") ? "text-green-500" : "text-red-500"
                     }`}
                   >
@@ -111,52 +76,6 @@ const Page = async ({}) => {
             )}
           </div>
         </div>
-
-        {/* <div>
-          <h2 className="text-2xl font-semibold mb-4 text-gray-800">Available Rewards</h2>
-          <div className="space-y-4">
-            {filteredRewards.length > 0 ? (
-              filteredRewards.map((reward) => (
-                <div key={reward.id} className="bg-white p-4 rounded-xl shadow-md">
-                  <div className="flex justify-between items-center mb-2">
-                    <h3 className="text-lg font-semibold text-gray-800">{reward.name}</h3>
-                    <span className="text-green-500 font-semibold">{reward.cost} points</span>
-                  </div>
-                  <p className="text-gray-600 mb-2">{reward.description}</p>
-                  <p className="text-sm text-gray-500 mb-4">{reward.collectionInfo}</p>
-                  {reward.id === 0 ? (
-                    <div className="space-y-2">
-                      <Button
-                        // onClick={handleRedeemAllPoints}
-                        className="w-full bg-green-500 hover:bg-green-600 text-white"
-                        disabled={balance === 0}
-                      >
-                        <Gift className="w-4 h-4 mr-2" />
-                        Redeem All Points
-                      </Button>
-                    </div>
-                  ) : (
-                    <Button
-                      onClick={() => handleRedeemReward(reward.id as string)}
-                      className="w-full bg-green-500 hover:bg-green-600 text-white"
-                      disabled={balance < reward.cost}
-                    >
-                      <Gift className="w-4 h-4 mr-2" />
-                      Redeem Reward
-                    </Button>
-                  )}
-                </div>
-              ))
-            ) : (
-              <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4 rounded-md">
-                <div className="flex items-center">
-                  <AlertCircle className="h-6 w-6 text-yellow-400 mr-3" />
-                  <p className="text-yellow-700">No rewards available at the moment.</p>
-                </div>
-              </div>
-            )}
-          </div>
-        </div> */}
       </div>
     </div>
   );

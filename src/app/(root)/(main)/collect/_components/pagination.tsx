@@ -9,14 +9,14 @@ interface PaginationProps {
 
 export const Pagination: FC<PaginationProps> = ({ pageCount }) => {
   const searchParams = useSearchParams();
-  const { replace } = useRouter();
+  const router = useRouter();
   const pathname = usePathname();
   const currentPage = parseInt(searchParams.get("page") || "1", 10);
 
   const handlePageChange = (page: number) => {
     const params = new URLSearchParams(searchParams);
     params.set("page", page.toString());
-    replace(`${pathname}?${params.toString()}`);
+    router.replace(`${pathname}?${params.toString()}`);
   };
 
   return (

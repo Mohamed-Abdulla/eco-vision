@@ -1,6 +1,7 @@
 "use client";
 import { Button } from "@/components/ui/button";
-import { updateTaskStatus } from "@/utils/db/actions/collection.actions";
+import { collectWaste, updateTaskStatus } from "@/utils/db/actions/collection.actions";
+import { createNotification } from "@/utils/db/actions/notifications.actions";
 import { updateRewardPoints } from "@/utils/db/actions/reward.actions";
 import { createTransaction } from "@/utils/db/actions/transactions.actions";
 import { GoogleGenerativeAI } from "@google/generative-ai";
@@ -131,10 +132,7 @@ export const Tasks: FC<TasksProps> = ({ tasks, userId, userRole }) => {
         if (parsedResult.wasteTypeMatch && parsedResult.quantityMatch && parsedResult.confidence > 0.7) {
           await handleStatusChange(selectedTask.id, "verified");
           const earnedReward = 20;
-          //~ also add to transaction
-          await createTransaction(userId, "earned_collect", earnedReward, "Earned reward for waste collection");
-          await updateRewardPoints(userId, earnedReward);
-
+          await collectWaste(userId, earnedReward);
           toast.success(`Verification successful! You earned ${earnedReward} tokens!`, {
             duration: 5000,
             position: "top-center",
@@ -173,8 +171,7 @@ export const Tasks: FC<TasksProps> = ({ tasks, userId, userRole }) => {
         );
         // Deduct points from the user
         const deductedPoints = 10;
-        await createTransaction(userId, "penalty", deductedPoints, "Deducted points for false claim");
-        await updateRewardPoints(userId, -deductedPoints);
+        await collectWaste(userId, deductedPoints, true);
         toast.success("Task marked as false claim successfully");
       } else {
         toast.error("Failed to mark task as false claim. Please try again.");
@@ -319,6 +316,7 @@ function StatusBadge({ status }: { status: CollectionTask["status"] }) {
     in_progress: { color: "bg-blue-100 text-blue-800", icon: Trash2 },
     completed: { color: "bg-green-100 text-green-800", icon: CheckCircle },
     verified: { color: "bg-purple-100 text-purple-800", icon: CheckCircle },
+    false_claim: { color: "bg-red-100 text-red-800", icon: CheckCircle },
   };
 
   const { color, icon: Icon } = statusConfig[status];
