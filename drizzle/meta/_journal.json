@@ -15,6 +15,13 @@
       "when": 1740211451279,
       "tag": "0001_smart_iron_lad",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1742713132904,
+      "tag": "0002_silly_butterfly",
+      "breakpoints": true
     }
   ]
 }

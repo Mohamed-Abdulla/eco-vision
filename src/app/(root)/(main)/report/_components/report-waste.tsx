@@ -15,9 +15,10 @@ const geminiApiKey = process.env.NEXT_PUBLIC_GEMINI_API_KEY;
 
 interface ReportWasteProps {
   userId: string;
+  isBanned: boolean;
 }
 
-export const ReportWaste: FC<ReportWasteProps> = ({ userId }) => {
+export const ReportWaste: FC<ReportWasteProps> = ({ userId, isBanned }) => {
   const [newReport, setNewReport] = useState({
     location: "",
     type: "",
@@ -177,6 +178,18 @@ export const ReportWaste: FC<ReportWasteProps> = ({ userId }) => {
       setIsSubmitting(false);
     }
   };
+
+  // check user ban status
+  if (isBanned) {
+    return (
+      <div className="bg-white p-8 rounded-2xl shadow-lg mb-12">
+        <h2 className="text-lg font-semibold text-red-600 mb-4">Reporting Suspended Due to Repeated False Claims</h2>
+        <p className="text-sm text-gray-700">
+          Your ability to report waste has been temporarily suspended. Please try again later.
+        </p>
+      </div>
+    );
+  }
 
   return (
     <form onSubmit={handleSubmit} className="bg-white p-8 rounded-2xl shadow-lg mb-12">

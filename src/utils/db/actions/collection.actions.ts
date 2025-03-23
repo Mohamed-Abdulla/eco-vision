@@ -2,7 +2,7 @@
 
 import { and, eq, ilike, sql } from "drizzle-orm";
 import { db } from "../config";
-import { Reports } from "../schema";
+import { Reports, Users } from "../schema";
 import { updateRewardPoints } from "./reward.actions";
 import { createTransaction } from "./transactions.actions";
 import { createNotification } from "./notifications.actions";
@@ -121,6 +121,23 @@ export async function collectWaste(userId: string, pointsEarned: number, isPenal
       createNotification(userId, notificationMessage, notificationType),
       updateRewardPoints(userId, pointsToUpdate),
     ]);
+
+    //also update false claim count in user table
+    if (isPenalty) {
+      await db
+        .update(Users)
+        .set({ falseReportCount: sql<number>`false_report_count + 1` })
+        .where(eq(Users.id, userId))
+        .execute();
+
+      //also if user has more than 3 false claims, block the user from reporting waste by reportingBanUntil timestamp
+      const user = await db.select().from(Users).where(eq(Users.id, userId)).execute();
+      if (user[0].falseReportCount >= 3) {
+        const banDuration = new Date();
+        banDuration.setDate(banDuration.getDate() + 7); //ban user for 7 days
+        await db.update(Users).set({ reportingBanUntil: banDuration }).where(eq(Users.id, userId)).execute();
+      }
+    }
 
     revalidatePath("/report");
     return true;

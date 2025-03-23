@@ -4,7 +4,8 @@ import { DM_Sans } from "next/font/google";
 import { Toaster } from "react-hot-toast";
 import "./globals.css";
 import { LayoutProvider } from "./providers/layout-provider";
-const font = DM_Sans({ subsets: ["latin"] });
+
+const font = DM_Sans({ subsets: ["latin"], display: "swap" });
 
 export const metadata: Metadata = {
   title: "Eco Vision",
@@ -17,15 +18,13 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <ClerkProvider>
-        <LayoutProvider>
-          <body className={`${font.className}  antialiased`}>
-            {children}
-            <Toaster />
-          </body>
-        </LayoutProvider>
-      </ClerkProvider>
-    </html>
+    <ClerkProvider>
+      <LayoutProvider>
+        <html lang="en">
+          <body className={`${font.className}  antialiased`}>{children}</body>
+        </html>
+        <Toaster />
+      </LayoutProvider>
+    </ClerkProvider>
   );
 }

@@ -26,7 +26,10 @@ const Page = async ({}) => {
   return (
     <div className="p-8 max-w-4xl mx-auto">
       <h1 className="text-3xl font-semibold mb-6 text-gray-800">Report waste</h1>
-      <ReportWaste userId={user.id} />
+      <ReportWaste
+        userId={user.id}
+        isBanned={!!(user.reportingBanUntil && new Date(user.reportingBanUntil) > new Date())}
+      />
       <h2 className="text-3xl font-semibold mb-6 text-gray-800">Recent Reports</h2>
       <div className="bg-white rounded-2xl shadow-lg overflow-hidden">
         <div className="max-h-96 overflow-y-auto">
