@@ -29,14 +29,13 @@ const Page: FC<PageProps> = async ({ searchParams }) => {
     return redirect("/");
   }
   const tasks = ((await getWasteCollectionTasks()) as CollectionTask[]) || [];
-
   const searchTerm = await searchParams;
   const query = searchTerm?.query || "";
   const currentPage = parseInt(searchTerm?.page || "1", 10);
 
   const filteredTasks = tasks.filter((task) => task.location.toLowerCase().includes(query.toLowerCase()));
   const pageCount = Math.ceil(filteredTasks.length / ITEMS_PER_PAGE);
-  const paginatedTasks = filteredTasks.slice((currentPage - 1) * ITEMS_PER_PAGE, currentPage * ITEMS_PER_PAGE);
+  const paginatedTasks = filteredTasks?.slice((currentPage - 1) * ITEMS_PER_PAGE, currentPage * ITEMS_PER_PAGE);
 
   return (
     <div className="p-4 sm:p-6 lg:p-8 max-w-4xl mx-auto">

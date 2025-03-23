@@ -11,8 +11,6 @@ export default async function MainLayout({
   children: React.ReactNode;
 }>) {
   const { userId } = await auth();
-  // const user = await currentUser();
-  // const role = user?.privateMetadata.role !== "ADMIN";
   if (!userId) {
     return redirect("/");
   }
