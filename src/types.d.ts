@@ -8,7 +8,7 @@ type Reward = {
 };
 type Transaction = {
   id: string;
-  type: "earned_report" | "earned_collect" | "redeemed";
+  type: "earned_report" | "earned_collect" | "redeemed" | "penalty";
   amount: number;
   description: string;
   date: string;
@@ -27,7 +27,7 @@ type CollectionTask = {
   location: string;
   wasteType: string;
   amount: string;
-  status: "pending" | "in_progress" | "completed" | "verified";
+  status: "pending" | "in_progress" | "completed" | "verified" | "false_claim";
   date: string;
   collectorId: string | null;
 };

@@ -43,7 +43,7 @@ const Page: FC<PageProps> = async ({ searchParams }) => {
       <h1 className="text-3xl font-semibold mb-6 text-gray-800">Waste Collection Tasks</h1>
       <SearchBox />
       <div className="space-y-4">
-        <Tasks tasks={paginatedTasks} userId={user.id} />
+        <Tasks tasks={paginatedTasks} userId={user.id} userRole={user.role} />
       </div>
       <Pagination pageCount={pageCount} />
     </div>

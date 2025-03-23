@@ -10,10 +10,12 @@ export const Users = pgTable(
     name: varchar("name", { length: 255 }).notNull(),
     createdAt: timestamp("created_at").defaultNow().notNull(),
     role: varchar("role", { length: 255 }).notNull().default("user"),
+    falseReportCount: integer("false_report_count").notNull().default(0),
+    reportingBanUntil: timestamp("reporting_ban_until"),
   },
-  (users) => ({
-    clerkIdIndex: index("clerk_id_idx").on(users.clerkId), // Indexed for faster retrieval
-  })
+  (users) => [
+    index("clerk_id_idx").on(users.clerkId), // Indexed for faster retrieval
+  ]
 );
 
 // Rewards table
@@ -72,6 +74,7 @@ export const CollectedWastes = pgTable("collected_wastes", {
     .notNull(),
   collectionDate: timestamp("collection_date").notNull(),
   status: varchar("status", { length: 20 }).notNull().default("collected"),
+  reason: text("reason"),
 });
 
 // Transactions table

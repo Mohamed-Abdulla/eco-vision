@@ -5,15 +5,11 @@ import { Rewards, Transactions, Users } from "../schema";
 
 export async function getAvailableRewards(userId: string) {
   try {
-    console.log("Fetching available rewards for user:", userId);
-
     // Get user's total points
     const userTransactions = await getRewardTransactions(userId);
     const userPoints = userTransactions.reduce((total, transaction) => {
       return transaction.type.startsWith("earned") ? total + transaction.amount : total - transaction.amount;
     }, 0);
-
-    console.log("User total points:", userPoints);
 
     // Get available rewards from the database
     const dbRewards = await db
@@ -28,8 +24,6 @@ export async function getAvailableRewards(userId: string) {
       .where(eq(Rewards.isAvailable, true))
       .execute();
 
-    console.log("Rewards from database:", dbRewards);
-
     // Combine user points and database rewards
     const allRewards = [
       {
@@ -42,8 +36,6 @@ export async function getAvailableRewards(userId: string) {
       ...dbRewards,
     ];
 
-    console.log("All available rewards:", allRewards);
-
     return allRewards;
   } catch (error) {
     console.error("Error fetching available rewards:", error);
@@ -53,7 +45,6 @@ export async function getAvailableRewards(userId: string) {
 
 export async function getRewardTransactions(userId: string) {
   try {
-    console.log("Fetching transactions for user ID:", userId);
     const transactions = await db
       .select({
         id: Transactions.id,
@@ -68,14 +59,11 @@ export async function getRewardTransactions(userId: string) {
       .limit(10)
       .execute();
 
-    console.log("Raw transactions from database:", transactions);
-
     const formattedTransactions = transactions.map((t) => ({
       ...t,
       date: t.date.toISOString().split("T")[0], // Format date as YYYY-MM-DD
     }));
 
-    console.log("Formatted transactions:", formattedTransactions);
     return formattedTransactions;
   } catch (error) {
     console.error("Error fetching reward transactions:", error);
@@ -110,7 +98,6 @@ export async function getAllRewardTransactions() {
       }, {})
     );
 
-    console.log("All transactions:", groupedTransactions);
     return groupedTransactions;
   } catch (error) {
     console.error("Error fetching all transactions:", error);
@@ -133,7 +120,6 @@ export async function getAllRewards() {
       .leftJoin(Users, eq(Rewards.userId, Users.id))
       .orderBy(desc(Rewards.points))
       .execute();
-    console.log("All rewards:", rewards);
     return rewards;
   } catch (error) {
     console.error("Error fetching all rewards:", error);

@@ -52,7 +52,7 @@ export const Header: FC<HeaderProps> = ({ balance, userId, notifications }) => {
             </div>
           </Link>
         </div>
-        {!isMobile && (
+        {/* {!isMobile && (
           <div className="flex-1 max-w-xl mx-4">
             <div className="relative">
               <input
@@ -63,7 +63,7 @@ export const Header: FC<HeaderProps> = ({ balance, userId, notifications }) => {
               <Search className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
             </div>
           </div>
-        )}
+        )} */}
         <div className="flex items-center">
           {isMobile && (
             <Button variant="ghost" size="icon" className="mr-2">

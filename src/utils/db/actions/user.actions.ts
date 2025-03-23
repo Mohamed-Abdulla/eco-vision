@@ -26,7 +26,6 @@ export async function getOrCreateUser(userId: string) {
     }
     const client = await clerkClient();
     const role = authUser?.privateMetadata.role;
-    console.log("role", role);
     if (!role) {
       await client.users.updateUserMetadata(userId, {
         privateMetadata: {
@@ -61,4 +60,28 @@ export async function getUserBalance(userId: string): Promise<number> {
     return transaction.type.startsWith("earned") ? acc + transaction.amount : acc - transaction.amount;
   }, 0);
   return Math.max(balance, 0); // Ensure balance is never negative
+}
+
+//  handle user false report count
+export async function handleUserFalseReportCount(userId: string) {
+  try {
+    const user = await db.select().from(Users).where(eq(Users.clerkId, userId)).execute();
+    if (user && user[0]) {
+      const falseReportCount = user[0].falseReportCount + 1;
+      // if false report count is 3, ban user from reporting for 1 day
+      if (falseReportCount === 3) {
+        const banUntil = new Date();
+        banUntil.setDate(banUntil.getDate() + 1);
+        await db
+          .update(Users)
+          .set({ falseReportCount, reportingBanUntil: banUntil })
+          .where(eq(Users.clerkId, userId))
+          .execute();
+      } else {
+        await db.update(Users).set({ falseReportCount }).where(eq(Users.clerkId, userId)).execute();
+      }
+    }
+  } catch (error) {
+    console.error("Error handling user false report count:", error);
+  }
 }

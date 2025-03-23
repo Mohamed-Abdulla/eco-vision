@@ -5,7 +5,7 @@ import { Transactions } from "../schema";
 
 export async function createTransaction(
   userId: string,
-  type: "earned_report" | "earned_collect" | "redeemed",
+  type: "earned_report" | "earned_collect" | "redeemed" | "penalty",
   amount: number,
   description: string
 ) {

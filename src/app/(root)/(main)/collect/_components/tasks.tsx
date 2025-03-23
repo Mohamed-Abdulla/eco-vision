@@ -1,6 +1,8 @@
 "use client";
 import { Button } from "@/components/ui/button";
 import { updateTaskStatus } from "@/utils/db/actions/collection.actions";
+import { updateRewardPoints } from "@/utils/db/actions/reward.actions";
+import { createTransaction } from "@/utils/db/actions/transactions.actions";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { Calendar, CheckCircle, Clock, Loader, MapPin, Trash2, Upload, Weight } from "lucide-react";
 import { FC, useEffect, useState } from "react";
@@ -9,10 +11,11 @@ import toast from "react-hot-toast";
 interface TasksProps {
   tasks: CollectionTask[];
   userId: string;
+  userRole: "admin" | "collector" | "user";
 }
 const geminiApiKey = process.env.NEXT_PUBLIC_GEMINI_API_KEY;
 
-export const Tasks: FC<TasksProps> = ({ tasks, userId }) => {
+export const Tasks: FC<TasksProps> = ({ tasks, userId, userRole }) => {
   const [tasksData, setTasksData] = useState<CollectionTask[]>([]);
   const [hoveredWasteType, setHoveredWasteType] = useState<string | null>(null);
   const [selectedTask, setSelectedTask] = useState<CollectionTask | null>(null);
@@ -127,15 +130,11 @@ export const Tasks: FC<TasksProps> = ({ tasks, userId }) => {
 
         if (parsedResult.wasteTypeMatch && parsedResult.quantityMatch && parsedResult.confidence > 0.7) {
           await handleStatusChange(selectedTask.id, "verified");
-          const earnedReward = Math.floor(Math.random() * 50) + 10; // Random reward between 10 and 59
+          const earnedReward = 20;
+          //~ also add to transaction
+          await createTransaction(userId, "earned_collect", earnedReward, "Earned reward for waste collection");
+          await updateRewardPoints(userId, earnedReward);
 
-          // Save the reward
-          //   await saveReward(user.id, earnedReward)
-
-          // Save the collected waste
-          //   await saveCollectedWaste(selectedTask.id, user.id, parsedResult)
-
-          //   setReward(earnedReward)
           toast.success(`Verification successful! You earned ${earnedReward} tokens!`, {
             duration: 5000,
             position: "top-center",
@@ -160,6 +159,31 @@ export const Tasks: FC<TasksProps> = ({ tasks, userId }) => {
     }
   };
 
+  const handleFalseClaim = async (task: CollectionTask) => {
+    if (!userId) {
+      toast.error("Please log in to mark a false claim.");
+      return;
+    }
+
+    try {
+      const updatedTask = await updateTaskStatus(task.id, "false_claim", userId);
+      if (updatedTask) {
+        setTasksData(
+          tasksData.map((t) => (t.id === task.id ? { ...t, status: "false_claim", collectorId: userId } : t))
+        );
+        // Deduct points from the user
+        const deductedPoints = 10;
+        await createTransaction(userId, "penalty", deductedPoints, "Deducted points for false claim");
+        await updateRewardPoints(userId, -deductedPoints);
+        toast.success("Task marked as false claim successfully");
+      } else {
+        toast.error("Failed to mark task as false claim. Please try again.");
+      }
+    } catch (error) {
+      console.error("Error marking task as false claim:", error);
+      toast.error("Failed to mark task as false claim. Please try again.");
+    }
+  };
   return (
     <div className="space-y-3">
       {tasksData.map((task) => (
@@ -202,10 +226,15 @@ export const Tasks: FC<TasksProps> = ({ tasks, userId }) => {
                 Start Collection
               </Button>
             )}
-            {task.status === "in_progress" && task.collectorId === userId && (
-              <Button onClick={() => setSelectedTask(task)} variant="outline" size="sm">
-                Complete & Verify
-              </Button>
+            {task.status === "in_progress" && (userRole === "admin" || userRole === "collector") && (
+              <div className="space-x-2">
+                <Button onClick={() => handleFalseClaim(task)} variant="destructive" size="sm">
+                  Mark as False Claim
+                </Button>
+                <Button onClick={() => setSelectedTask(task)} variant="outline" size="sm">
+                  Complete & Verify
+                </Button>
+              </div>
             )}
             {task.status === "in_progress" && task.collectorId !== userId && (
               <span className="text-yellow-600 text-sm font-medium">In progress by another collector</span>
@@ -216,7 +245,7 @@ export const Tasks: FC<TasksProps> = ({ tasks, userId }) => {
       ))}
 
       {selectedTask && (
-        <div className="fixed top-15 inset-0 bg-slate-100 backdrop-blur-3xl bg-opacity-50 flex items-center justify-center p-4 z-50">
+        <div className="fixed inset-0 bg-black/50 bg-opacity-50 flex items-center justify-center p-4 z-50">
           <div className="bg-white rounded-lg p-6 max-w-2xl w-full max-h-[90vh] overflow-y-auto">
             <h3 className="text-xl font-semibold mb-4">Verify Collection</h3>
             <p className="mb-4 text-sm text-gray-600">

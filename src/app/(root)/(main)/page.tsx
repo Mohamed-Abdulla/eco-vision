@@ -13,10 +13,6 @@ export default async function Home() {
     getWasteCollectionTasks(100).catch(() => []),
   ]);
 
-  console.log("Reports:", reports);
-  console.log("Rewards:", rewards);
-  console.log("Tasks:", tasks);
-
   // Process data efficiently
   const wasteCollected =
     tasks?.reduce((total, task) => {
